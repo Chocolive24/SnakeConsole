@@ -12,19 +12,12 @@ void GameView::Update(Console::Controller* controller, Console::Screen& screen)
 
 	auto mainController = static_cast<MainController*>(controller);
 	std::vector<SnakePosition>& snake = mainController->GetSnake();
-	bool mustUpdate = controller->CurrentFPS > 0 && controller->Tick > 0;
+	bool mustUpdate = controller->Tick > 0;
 	std::vector<SnakePosition> newPositions = {};
 
 	if (mustUpdate)
 	{
-		if (mainController->GetDirection() == Direction::DOWN || mainController->GetDirection() == Direction::UP)
-		{
-			mustUpdate = controller->Tick % static_cast<int>(controller->CurrentFPS * 0.05 * 1.25) == 0;
-		}
-		else
-		{
-			mustUpdate = controller->Tick % static_cast<int>(controller->CurrentFPS * 0.05) == 0;
-		}
+		mustUpdate = controller->Tick % 2 == 0;
 	}
 
 	int i = 0;
@@ -71,8 +64,7 @@ void GameView::Update(Console::Controller* controller, Console::Screen& screen)
 		{
 			color = RGB(60, 60, 230);
 		}
-
-		screen.Draw(Console::PixelColor(position.X, position.Y, color));
+		
 		screen.DrawCircle(position.X, position.Y, MainController::SNAKE_WIDTH, color);
 		i++;
 	}
@@ -92,19 +84,19 @@ void GameView::OnKeyPressed(Console::Controller* controller, char key)
 {
 	const auto mainController = static_cast<MainController*>(controller);
 
-	if (key == Console::Key::Up)
+	if (key == Console::Key::Up && mainController->GetDirection() != Direction::DOWN)
 	{
 		mainController->SetDirection(Direction::UP);
 	}
-	else if (key == Console::Key::Down)
+	else if (key == Console::Key::Down && mainController->GetDirection() != Direction::UP)
 	{
 		mainController->SetDirection(Direction::DOWN);
 	}
-	else if (key == Console::Key::Left)
+	else if (key == Console::Key::Left && mainController->GetDirection() != Direction::RIGHT)
 	{
 		mainController->SetDirection(Direction::LEFT);
 	}
-	else if (key == Console::Key::Right)
+	else if (key == Console::Key::Right && mainController->GetDirection() != Direction::LEFT)
 	{
 		mainController->SetDirection(Direction::RIGHT);
 	}
