@@ -1,16 +1,18 @@
 #include "GameView.h"
 #include "../controller/MainController.h"
 
-GameView::GameView()
-{
-
-}
-
 void GameView::Update(Console::Controller* controller, Console::Screen& screen)
 {
 	View::Update(controller, screen);
 
-	auto mainController = static_cast<MainController*>(controller);
+	if (_pause)
+	{
+		//screen.DrawRect(Console::Screen::WIDTH_PIXEL / 2, Console::Screen::HEIGHT_PIXEL / 2 - 25, 50, 30, RGB(200, 200, 200));
+		screen.Draw(Console::Text{ .Str = "PAUSE", .X = screen.GetWidth() / 2, .Y = screen.GetHeight() / 2, .Foreground = Console::Foreground::CYAN });
+		return;
+	}
+
+	const auto mainController = static_cast<MainController*>(controller);
 	std::vector<SnakePosition>& snake = mainController->GetSnake();
 	bool mustUpdate = controller->Tick > 0;
 	std::vector<SnakePosition> newPositions = {};
@@ -54,18 +56,9 @@ void GameView::Update(Console::Controller* controller, Console::Screen& screen)
 			}
 		}
 		
-		COLORREF color;
-
-		if (snake.front() == position)
-		{
-			color = RGB(50, 50, 200);
-		}
-		else
-		{
-			color = RGB(60, 60, 230);
-		}
+		const COLORREF snakeColor = RGB(70, 70, 255 - 100 / snake.size() * (i+1) );
 		
-		screen.DrawCircle(position.X, position.Y, MainController::SNAKE_WIDTH, color);
+		screen.DrawCircle(position.X, position.Y, MainController::SNAKE_WIDTH, snakeColor);
 		i++;
 	}
 
@@ -99,6 +92,11 @@ void GameView::OnKeyPressed(Console::Controller* controller, char key)
 	else if (key == Console::Key::Right && mainController->GetDirection() != Direction::LEFT)
 	{
 		mainController->SetDirection(Direction::RIGHT);
+	}
+
+	if (key == Console::Key::Space)
+	{
+		_pause = !_pause;
 	}
 
 	View::OnKeyPressed(controller, key);
