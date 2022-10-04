@@ -25,8 +25,11 @@ class MainController : public Console::Controller
 private:
 	std::vector<SnakePosition> _snake;
 	Direction _direction;
+
 public:
 	MainController();
+
+	inline static int SNAKE_WIDTH = 5;
 
 	void InitializeGame();
 	std::vector<SnakePosition>& GetSnake() { return _snake; }

@@ -10,11 +10,11 @@ MainController::MainController()
 void MainController::InitializeGame()
 {
 	_direction = Direction::RIGHT;
-	_snake = {
-		SnakePosition(10, 1),
-		SnakePosition(9, 1),
-		SnakePosition(8, 1),
-		SnakePosition(7, 1),
-		SnakePosition(6, 1),
-	};
+	int x = 100;
+
+	for (int i = 0; i < 5; i++)
+	{
+		_snake.emplace_back(SnakePosition(x, 100));
+		x -= SNAKE_WIDTH * 2;
+	}
 }

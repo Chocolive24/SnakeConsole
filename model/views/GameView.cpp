@@ -10,7 +10,7 @@ void GameView::Update(Console::Controller* controller, Console::Screen& screen)
 {
 	View::Update(controller, screen);
 
-	auto mainController = dynamic_cast<MainController*>(controller);
+	auto mainController = static_cast<MainController*>(controller);
 	std::vector<SnakePosition>& snake = mainController->GetSnake();
 	bool mustUpdate = controller->CurrentFPS > 0 && controller->Tick > 0;
 	std::vector<SnakePosition> newPositions = {};
@@ -28,7 +28,7 @@ void GameView::Update(Console::Controller* controller, Console::Screen& screen)
 	}
 
 	int i = 0;
-	for (SnakePosition& position: snake)
+	for (const SnakePosition& position: snake)
 	{
 		if (mustUpdate)
 		{
@@ -38,19 +38,19 @@ void GameView::Update(Console::Controller* controller, Console::Screen& screen)
 
 				if (mainController->GetDirection() == Direction::UP)
 				{
-					newPosition = SnakePosition(position.X, position.Y - 1);
+					newPosition = SnakePosition(position.X, position.Y - MainController::SNAKE_WIDTH * 2);
 				}
 				else if (mainController->GetDirection() == Direction::DOWN)
 				{
-					newPosition = SnakePosition(position.X, position.Y + 1);
+					newPosition = SnakePosition(position.X, position.Y + MainController::SNAKE_WIDTH * 2);
 				}
 				else if (mainController->GetDirection() == Direction::LEFT)
 				{
-					newPosition = SnakePosition(position.X - 1, position.Y);
+					newPosition = SnakePosition(position.X - MainController::SNAKE_WIDTH * 2, position.Y);
 				}
 				else if (mainController->GetDirection() == Direction::RIGHT)
 				{
-					newPosition = SnakePosition(position.X + 1, position.Y);
+					newPosition = SnakePosition(position.X + MainController::SNAKE_WIDTH * 2, position.Y);
 				}
 
 				newPositions.emplace_back(newPosition);
@@ -60,23 +60,20 @@ void GameView::Update(Console::Controller* controller, Console::Screen& screen)
 				newPositions.emplace_back(snake[i - 1]);
 			}
 		}
-
-		Console::Background background;
+		
 		COLORREF color;
 
 		if (snake.front() == position)
 		{
-			background = Console::Background::CYAN;
 			color = RGB(50, 50, 200);
 		}
 		else
 		{
-			background = Console::Background::WHITE;
 			color = RGB(60, 60, 230);
 		}
 
 		screen.Draw(Console::PixelColor(position.X, position.Y, color));
-		//screen.Draw(Console::Text{ .Str = " ", .X = position.X, .Y = position.Y, .Background = background });
+		screen.DrawCircle(position.X, position.Y, MainController::SNAKE_WIDTH, color);
 		i++;
 	}
 
@@ -93,7 +90,7 @@ void GameView::Update(Console::Controller* controller, Console::Screen& screen)
 
 void GameView::OnKeyPressed(Console::Controller* controller, char key)
 {
-	auto mainController = dynamic_cast<MainController*>(controller);
+	const auto mainController = static_cast<MainController*>(controller);
 
 	if (key == Console::Key::Up)
 	{
