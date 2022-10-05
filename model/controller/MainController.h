@@ -25,7 +25,7 @@ class MainController : public Console::Controller
 private:
 	std::vector<SnakePosition> _snake;
 	Direction _direction;
-
+	bool _canChangeDirection;
 public:
 	MainController();
 
@@ -33,7 +33,8 @@ public:
 
 	void InitializeGame();
 	std::vector<SnakePosition>& GetSnake() { return _snake; }
-	Direction GetDirection() { return _direction; }
-	void SetDirection(Direction direction) { _direction = direction; }
+	Direction GetDirection() const { return _direction; }
+	void SetDirection(Direction direction);
+	void UpdateSnakePosition();
 };
 
