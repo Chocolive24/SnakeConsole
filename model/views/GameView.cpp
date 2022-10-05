@@ -19,7 +19,7 @@ void GameView::Update(Console::Controller* controller, Console::Screen& screen)
 	{
 		const COLORREF snakeColor = RGB(70, 70, 255 - 150 / snake.size() * (i+1) );
 		
-		screen.DrawCircle(position.X, position.Y, MainController::SNAKE_WIDTH, snakeColor);
+		screen.DrawCircle(position.X, position.Y, MainController::SNAKE_WIDTH, snakeColor, true);
 		i++;
 	}
 
@@ -34,7 +34,6 @@ void GameView::Update(Console::Controller* controller, Console::Screen& screen)
 void GameView::OnKeyPressed(Console::Controller* controller, char key)
 {
 	const auto mainController = static_cast<MainController*>(controller);
-
 	
 	if (key == Console::Key::Up && mainController->GetDirection() != Direction::DOWN)
 	{

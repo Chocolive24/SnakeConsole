@@ -36,10 +36,10 @@ void MainController::UpdateSnakePosition()
 	int i = 0;
 	for (const SnakePosition& position : _snake)
 	{
+		SnakePosition newPosition;
+
 		if (_snake.front() == position)
 		{
-			SnakePosition newPosition;
-
 			if (_direction == Direction::UP)
 			{
 				newPosition = SnakePosition(position.X, position.Y - SNAKE_WIDTH * 2);
@@ -61,8 +61,10 @@ void MainController::UpdateSnakePosition()
 		}
 		else
 		{
-			newPositions.emplace_back(_snake[i - 1]);
+			newPosition = _snake[i - 1];
+			newPositions.emplace_back(newPosition);
 		}
+
 		i++;
 	}
 
