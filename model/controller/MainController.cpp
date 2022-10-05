@@ -11,12 +11,12 @@ void MainController::InitializeGame()
 {
 	_direction = Direction::RIGHT;
 	_canChangeDirection = true;
-	int x = 100;
+	int x = 20 + SNAKE_START_PARTS * GetSpaceBetweenSnakeParts();
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < SNAKE_START_PARTS; i++)
 	{
 		_snake.emplace_back(SnakePosition(x, 100));
-		x -= SNAKE_WIDTH * 2;
+		x -= GetSpaceBetweenSnakeParts();
 	}
 }
 
@@ -36,33 +36,32 @@ void MainController::UpdateSnakePosition()
 	int i = 0;
 	for (const SnakePosition& position : _snake)
 	{
-		SnakePosition newPosition;
-
-		if (_snake.front() == position)
+		if (i == 0)
 		{
+			SnakePosition newPosition;
+
 			if (_direction == Direction::UP)
 			{
-				newPosition = SnakePosition(position.X, position.Y - SNAKE_WIDTH * 2);
+				newPosition = SnakePosition(position.X, position.Y - GetSpaceBetweenSnakeParts());
 			}
 			else if (_direction == Direction::DOWN)
 			{
-				newPosition = SnakePosition(position.X, position.Y + SNAKE_WIDTH * 2);
+				newPosition = SnakePosition(position.X, position.Y + GetSpaceBetweenSnakeParts());
 			}
 			else if (_direction == Direction::LEFT)
 			{
-				newPosition = SnakePosition(position.X - SNAKE_WIDTH * 2, position.Y);
+				newPosition = SnakePosition(position.X - GetSpaceBetweenSnakeParts(), position.Y);
 			}
 			else if (_direction == Direction::RIGHT)
 			{
-				newPosition = SnakePosition(position.X + SNAKE_WIDTH * 2, position.Y);
+				newPosition = SnakePosition(position.X + GetSpaceBetweenSnakeParts(), position.Y);
 			}
 
 			newPositions.emplace_back(newPosition);
 		}
 		else
 		{
-			newPosition = _snake[i - 1];
-			newPositions.emplace_back(newPosition);
+			newPositions.emplace_back(_snake[i - 1]);
 		}
 
 		i++;
@@ -74,4 +73,21 @@ void MainController::UpdateSnakePosition()
 	}
 
 	_canChangeDirection = true;
+}
+
+bool MainController::CanUpdateSnakePosition() const
+{
+	if (Tick > 0 && CurrentFPS > 0)
+	{
+		int updatePerTick = CurrentFPS / SNAKE_UPDATE_PER_SECOND;
+
+		if (updatePerTick == 0)
+		{
+			updatePerTick = 1;
+		}
+
+		return Tick % updatePerTick == 0;
+	}
+
+	return false;
 }

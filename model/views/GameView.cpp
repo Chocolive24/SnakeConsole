@@ -7,7 +7,8 @@ void GameView::Update(Console::Controller* controller, Console::Screen& screen)
 
 	if (_pause)
 	{
-		screen.Draw(Console::Text{ .Str = "PAUSE", .X = screen.GetWidth() / 2, .Y = screen.GetHeight() / 2, .Foreground = Console::Foreground::CYAN });
+		screen.Draw(Console::Text{ .Str = "PAUSE", .X = screen.GetWidth() / 2, .Y = screen.GetHeight() / 2, .XCentered = true,
+			.Background = Console::Background::WHITE, .Foreground = Console::Foreground::CYAN });
 		return;
 	}
 
@@ -25,7 +26,7 @@ void GameView::Update(Console::Controller* controller, Console::Screen& screen)
 
 	screen.Draw(Console::Text{ .Str = "FPS: " + std::to_string(controller->CurrentFPS), .X = 1, .Y = 1 });
 
-	if (controller->Tick > 0 && controller->Tick % 2 == 0)
+	if (mainController->CanUpdateSnakePosition())
 	{
 		mainController->UpdateSnakePosition();
 	}
