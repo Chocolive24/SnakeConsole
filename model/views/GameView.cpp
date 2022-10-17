@@ -1,56 +1,92 @@
 #include "GameView.h"
-#include "../controller/MainController.h"
+#include "../controller/Game.h"
 
-void GameView::Update(Console::Controller* controller, Console::Screen& screen)
+GameView::GameView(Game* game)
 {
-	View::Update(controller, screen);
+	_game = game;
+	_pause = false;
+}
+
+void GameView::Update(Console::Screen& screen)
+{
+	View::Update(screen);
+
+	screen.Draw(Console::Text{
+		.Str = "Score: " + std::to_string(_game->GetScore()) + " pts | Combo x" + std::to_string(_game->GetCombo()),
+		.X = PositionX(0.5f).GetValue(),
+		.Y = 2,
+		.XCentered = true
+	});
 
 	if (_pause)
 	{
-		screen.Draw(Console::Text{ .Str = "PAUSE", .X = screen.GetWidth() / 2, .Y = screen.GetHeight() / 2, .XCentered = true,
-			.Background = Console::Background::WHITE, .Foreground = Console::Foreground::CYAN });
+		screen.Draw(Console::Text{
+			.Str = "PAUSE",
+			.X = PositionX(0.5f).GetValue(),
+			.Y = PositionY(0.5f).GetValue(),
+			.XCentered = true,
+			.Background = Console::Background::WHITE,
+			.Foreground = Console::Foreground::CYAN
+		});
+
 		return;
 	}
 
-	const auto mainController = static_cast<MainController*>(controller);
-	const std::vector<SnakePosition>& snake = mainController->GetSnake();
+	if (_game->HasLost())
+	{
+		screen.Draw(Console::Text{
+			.Str = "You lost !",
+			.X = PositionX(0.5f).GetValue(),
+			.Y = PositionY(0.5f).GetValue(),
+			.XCentered = true,
+			.Background = Console::Background::RED,
+			.Foreground = Console::Foreground::WHITE
+		});
+
+		screen.Draw(Console::Text{
+			.Str = "Press R to restart",
+			.X = PositionX(0.5f).GetValue(),
+			.Y = PositionY(0.75f).GetValue(),
+			.XCentered = true
+		});
+	}
+
+	const std::vector<Point>& snake = _game->GetSnake();
 
 	int i = 0;
-	for (const SnakePosition& position: snake)
+	for (const Point& position: snake)
 	{
 		const COLORREF snakeColor = RGB(70, 70, 255 - 150 / snake.size() * (i+1) );
 		
-		screen.DrawCircle(position.X, position.Y, MainController::SNAKE_WIDTH, snakeColor, true);
+		screen.DrawCircle(position.X, position.Y, Game::SNAKE_WIDTH, snakeColor, true);
 		i++;
 	}
 
-	screen.Draw(Console::Text{ .Str = "FPS: " + std::to_string(controller->CurrentFPS), .X = 1, .Y = 1 });
+	constexpr COLORREF eggColor = RGB(200, 200, 200);
+	Point egg = _game->GetEgg();
 
-	if (mainController->CanUpdateSnakePosition())
-	{
-		mainController->UpdateSnakePosition();
-	}
+	screen.DrawCircle(egg.X, egg.Y, Game::SNAKE_WIDTH, eggColor, true);
+
+	screen.Draw(Console::Text{ .Str = "FPS: " + std::to_string(Console::Controller::FPS), .X = 1, .Y = 1 });
 }
 
-void GameView::OnKeyPressed(Console::Controller* controller, char key)
+void GameView::OnKeyPressed(char key)
 {
-	const auto mainController = static_cast<MainController*>(controller);
-	
-	if (key == Console::Key::Up && mainController->GetDirection() != Direction::DOWN)
+	if (key == Console::Key::Up && _game->GetDirection() != Direction::DOWN)
 	{
-		mainController->SetDirection(Direction::UP);
+		_game->SetDirection(Direction::UP);
 	}
-	else if (key == Console::Key::Down && mainController->GetDirection() != Direction::UP)
+	else if (key == Console::Key::Down && _game->GetDirection() != Direction::UP)
 	{
-		mainController->SetDirection(Direction::DOWN);
+		_game->SetDirection(Direction::DOWN);
 	}
-	else if (key == Console::Key::Left && mainController->GetDirection() != Direction::RIGHT)
+	else if (key == Console::Key::Left && _game->GetDirection() != Direction::RIGHT)
 	{
-		mainController->SetDirection(Direction::LEFT);
+		_game->SetDirection(Direction::LEFT);
 	}
-	else if (key == Console::Key::Right && mainController->GetDirection() != Direction::LEFT)
+	else if (key == Console::Key::Right && _game->GetDirection() != Direction::LEFT)
 	{
-		mainController->SetDirection(Direction::RIGHT);
+		_game->SetDirection(Direction::RIGHT);
 	}
 
 	if (key == Console::Key::Space)
@@ -58,5 +94,18 @@ void GameView::OnKeyPressed(Console::Controller* controller, char key)
 		_pause = !_pause;
 	}
 
-	View::OnKeyPressed(controller, key);
+	if (_game->HasLost() && key == 'r')
+	{
+		_game->InitializeGame();
+	}
+
+	View::OnKeyPressed(key);
+}
+
+void GameView::OnTick(int deltaTime)
+{
+	if (!_game->HasLost() && !_pause && _game->CanUpdateSnakePosition(deltaTime))
+	{
+		_game->UpdateSnakePosition();
+	}
 }

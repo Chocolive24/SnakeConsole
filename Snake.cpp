@@ -1,11 +1,12 @@
 #include "libs/ConsoleViewController/ConsoleViewController.h"
-#include "model/controller/MainController.h"
+#include "model/controller/Game.h"
 
 int main()
 {
-    Console::Screen::SetWindowSize(1000, 700);
+    Console::Screen::EnableVirtualTerminalProcessing();
+    Console::Screen::SetWindowSize(700, 500);
     Console::Screen::CenterWindow();
 
-    MainController mainController;
-    mainController.Start();
+    Game game;
+    game.Start();
 }

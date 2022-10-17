@@ -1,15 +1,18 @@
 #pragma once
 #include "../../libs/ConsoleViewController/ConsoleViewController.h"
+#include "../controller/Game.h"
 
 class GameView : public Console::View
 {
 private:
+	Game* _game;
 	bool _pause;
 
 public:
-	GameView() = default;
+	GameView(Game* game);
 
-	void Update(Console::Controller* controller, Console::Screen& screen) override;
-	void OnKeyPressed(Console::Controller* controller, char key) override;
+	void Update(Console::Screen& screen) override;
+	void OnKeyPressed(char key) override;
+	void OnTick(int deltaTime) override;
 };
 

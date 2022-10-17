@@ -54,10 +54,13 @@
     <ClCompile Include="model\views\GameView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="model\controller\MainController.cpp">
+    <ClCompile Include="model\controller\Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Snake.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\ConsoleViewController\utilities\Random.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -107,7 +110,10 @@
     <ClInclude Include="model\views\GameView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="model\controller\MainController.h">
+    <ClInclude Include="model\controller\Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\ConsoleViewController\utilities\Random.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
